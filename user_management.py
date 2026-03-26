@@ -1,6 +1,7 @@
 import sqlite3 as sql
 import time
 import random
+import html
 
 
 def insertUser(username, password, DoB):
@@ -25,8 +26,12 @@ def retrieveUsers(username, password):
         cur.execute("SELECT * FROM users WHERE password = ?", (password,))
         # Plain text log of visitor count as requested by Unsecure PWA management
         with open("visitor_log.txt", "r") as file:
-            number = int(file.read().strip())
-            number += 1
+            content = file.read().strip()
+        try:
+            number = int(content)
+        except ValueError:
+            number = 0  # Reset to safe default
+        number += 1
         with open("visitor_log.txt", "w") as file:
             file.write(str(number))
         # Simulate response time of heavy app for testing purposes
@@ -55,6 +60,6 @@ def listFeedback():
     f = open("templates/partials/success_feedback.html", "w")
     for row in data:
         f.write("<p>\n")
-        f.write(f"{row[1]}\n")
+        f.write(html.escape(row[1]) + "\n")
         f.write("</p>\n")
     f.close()
