@@ -36,17 +36,9 @@ def retrieveUsers(username, password):
     else:
         con.close()
         return False
-
         # Plain text log of visitor count as requested by Unsecure PWA management
-        with open("visitor_log.txt", "r") as file:
-            content = file.read().strip()
-        try:
-            number = int(content)
-        except ValueError:
-            number = 0  # Reset to safe default
-        number += 1
-        with open("visitor_log.txt", "w") as file:
-            file.write(str(number))
+        cur.execute("UPDATE metrics SET login_count = login_count + 1")
+        con.commit()
         # Simulate response time of heavy app for testing purposes
         time.sleep(random.randint(80, 90) / 1000)
         if cur.fetchone() == None:
