@@ -2,15 +2,18 @@ import sqlite3 as sql
 import time
 import random
 import html
+import bcrypt
 
 
 def insertUser(username, password, DoB):
     con = sql.connect("database_files/database.db")
     cur = con.cursor()
+    hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
     cur.execute(
-        "INSERT INTO users (username,password,dateOfBirth) VALUES (?,?,?)",
-        (username, password, DoB),
+        "INSERT INTO users (username,password) VALUES (?,?)",
+        (username, hashed),
     )
+
     con.commit()
     con.close()
 
@@ -18,12 +21,22 @@ def insertUser(username, password, DoB):
 def retrieveUsers(username, password):
     con = sql.connect("database_files/database.db")
     cur = con.cursor()
-    cur.execute("SELECT * FROM users WHERE username = ?", (username,))
-    if cur.fetchone() == None:
+    cur.execute("SELECT password FROM users WHERE username = ?", (username,))
+    row = cur.fetchone()
+
+    if row is None:
         con.close()
         return False
+
+    stored_hash = row[0]
+
+    if bcrypt.checkpw(password.encode(), stored_hash):
+        con.close()
+        return True
     else:
-        cur.execute("SELECT * FROM users WHERE password = ?", (password,))
+        con.close()
+        return False
+
         # Plain text log of visitor count as requested by Unsecure PWA management
         with open("visitor_log.txt", "r") as file:
             content = file.read().strip()
