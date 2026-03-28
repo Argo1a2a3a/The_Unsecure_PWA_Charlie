@@ -3,10 +3,12 @@ import time
 import random
 import html
 import bcrypt
+import os
 
 
 def insertUser(username, password, DoB):
-    con = sql.connect("database_files/database.db")
+    db_path = os.getenv("DB_PATH")
+    con = sql.connect(db_path)
     cur = con.cursor()
     hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
     cur.execute(
@@ -19,7 +21,8 @@ def insertUser(username, password, DoB):
 
 
 def retrieveUsers(username, password):
-    con = sql.connect("database_files/database.db")
+    db_path = os.getenv("DB_PATH")
+    con = sql.connect(db_path)
     cur = con.cursor()
     cur.execute("SELECT password FROM users WHERE username = ?", (username,))
     row = cur.fetchone()
@@ -50,7 +53,8 @@ def retrieveUsers(username, password):
 
 
 def insertFeedback(feedback):
-    con = sql.connect("database_files/database.db")
+    db_path = os.getenv("DB_PATH")
+    con = sql.connect(db_path)
     cur = con.cursor()
     cur.execute(f"INSERT INTO feedback (feedback) VALUES ('{feedback}')")
     con.commit()
@@ -58,7 +62,8 @@ def insertFeedback(feedback):
 
 
 def listFeedback():
-    con = sql.connect("database_files/database.db")
+    db_path = os.getenv("DB_PATH")
+    con = sql.connect(db_path)
     cur = con.cursor()
     data = cur.execute("SELECT * FROM feedback").fetchall()
     con.close()
