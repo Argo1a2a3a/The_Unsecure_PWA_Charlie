@@ -30,13 +30,15 @@ def retrieveUsers(username, password):
     if row is None:
         con.close()
         return False
-
+    else:
+        cur.execute("SELECT password FROM users WHERE password = ?", (password,))
     stored_hash = row[0]
 
     if bcrypt.checkpw(password.encode(), stored_hash):
         con.close()
         return True
     else:
+        time.sleep(1)
         con.close()
         return False
         # Plain text log of visitor count as requested by Unsecure PWA management
